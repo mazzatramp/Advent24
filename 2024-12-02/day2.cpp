@@ -10,10 +10,10 @@ std::pair<int,int> getNears(std::vector<int>& report, int i, int ig=-1) {
     int first = i == ig ? i+1 : i; 
     int second = (i == ig || i+1 == ig) ? i+2 : i+1;
 
-    if (first > report.size()) first = report.size() - 1;
-    if (second > report.size() - 1) second = report.size() - 1;
-
-    return {report[first], report[second]};
+    if (first < report.size() && second < report.size()) {
+        return {report[first], report[second]};
+    }
+    else return {report[0], report[1]}; //return something that would pass tests.
 }
 
 bool stillMonotone(bool increasing, std::pair<int,int> nears) {
@@ -23,7 +23,7 @@ bool stillMonotone(bool increasing, std::pair<int,int> nears) {
 
 bool smallDifference(std::pair<int,int> nears) {
     int diff = std::abs(nears.first - nears.second);
-    return diff <= 3 && diff >= 1;
+    return diff >= 1 && diff <= 3;
 }
 
 bool isSafe (std::vector<int> report) {
@@ -31,12 +31,16 @@ bool isSafe (std::vector<int> report) {
     bool safe_report = true;
     std::vector<int> toIgnore = {};
 
+    static int c = 1;
+    //std::cout << c++ << ": \t";
     for (int i = 0; i < report.size() - 1; ++i) {
         std::pair<int,int> nears = getNears(report, i);
+        
         if (!stillMonotone(increasing, nears) || !smallDifference(nears)) { 
-                safe_report = false;
-                toIgnore.push_back(i);
-                toIgnore.push_back(i+1);
+            safe_report = false;
+            toIgnore.push_back(i);
+            toIgnore.push_back(i+1);
+            //std::cout << i << "," << i+1 << " ";
         }
     }
 
@@ -68,18 +72,23 @@ int main() {
     }
 
     int safe_count = 0;
+    int count = 1;
     for (auto& report : reports) {
         bool issafeee = isSafe(report);
         safe_count += issafeee;
+
+
+
         if (!issafeee) {
             for(int& n : report) {
                //std::cout << n << " ";
             }
-            //std::cout << std::endl;
+            //std::cout << "\tunsafe";
         }
+        //std::cout << std::endl;
     }
 
-    std::cout << safe_count << std::endl;
+    std::cout << std::endl << safe_count << std::endl;
 
     return 0;
 }
